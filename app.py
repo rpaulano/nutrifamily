@@ -4,38 +4,70 @@ import json
 import random
 
 # -----------------------------------------------------------------------------
-# 1. CONFIGURACIÓN DE PÁGINA Y ESTILOS VISUALES (REQUISITO 19: Interfaz Comercial)
+# 1. ESTILOS VISUALES (Inspiración UI: BLW Ideas & Premium Health Apps)
 # -----------------------------------------------------------------------------
 st.set_page_config(
-    page_title="NutriFamily Pro | Nutrición Familiar Inteligente",
-    page_icon="🥗",
+    page_title="NutriFamily | Menús Familiares Inteligentes",
+    page_icon="🥑",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# CSS Personalizado para un diseño comercial, atractivo y colorido
 st.markdown("""
 <style>
-    .main { background: linear-gradient(185deg, #F4F9F4 0%, #E8F5E9 100%); }
-    .main-title {
-        background: linear-gradient(135deg, #2E7D32 0%, #4CAF50 100%);
-        padding: 1.8rem; border-radius: 16px; color: white; text-align: center;
-        box-shadow: 0 6px 15px rgba(46,125,50,0.2); margin-bottom: 1.5rem;
+    @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap');
+    
+    html, body, [class*="css"] {
+        font-family: 'Quicksand', sans-serif;
     }
-    .badge-eco {
-        background-color: #E8F5E9; color: #2E7D32; border: 1px solid #C8E6C9;
-        padding: 4px 12px; border-radius: 12px; font-weight: bold; font-size: 0.85rem;
+    
+    .main {
+        background-color: #FAFAFA;
     }
+    
+    .header-card {
+        background: linear-gradient(135deg, #FF8A65 0%, #FFB74D 100%);
+        padding: 2rem;
+        border-radius: 24px;
+        color: white;
+        text-align: center;
+        box-shadow: 0 10px 20px rgba(255, 138, 101, 0.25);
+        margin-bottom: 2rem;
+    }
+    
+    .profile-card {
+        background-color: #FFFFFF;
+        border-radius: 18px;
+        padding: 1.2rem;
+        border-left: 6px solid #4CAF50;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        margin-bottom: 1rem;
+    }
+    
+    .badge-tag {
+        background-color: #E8F5E9;
+        color: #2E7D32;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 0.8rem;
+    }
+    
     .footer-warning {
-        background-color: #FFF8E1; border: 1px solid #FFE082; color: #856404;
-        padding: 12px 20px; border-radius: 10px; font-size: 0.8rem; text-align: center;
-        margin-top: 50px;
+        background-color: #FFF3E0;
+        border: 2px solid #FFE0B2;
+        color: #E65100;
+        padding: 16px;
+        border-radius: 16px;
+        font-size: 0.85rem;
+        text-align: center;
+        margin-top: 40px;
     }
 </style>
 """, unsafe_allow_html=True)
 
 # -----------------------------------------------------------------------------
-# 2. ESTADO DE LA SESIÓN & SINCRONIZACIÓN AUTOMÁTICA (REQUISITOS 15, 16)
+# 2. ESTADO DE LA SESIÓN Y SINCRONIZACIÓN
 # -----------------------------------------------------------------------------
 if 'cuenta_id' not in st.session_state:
     st.session_state.cuenta_id = "FAMILIA-DEMO-2026"
@@ -48,364 +80,332 @@ if 'checklist_compra' not in st.session_state:
 if 'comunidad_recetas' not in st.session_state:
     st.session_state.comunidad_recetas = [
         {
-            "nombre": "Bowl de Chía y Mango (Comunidad)",
+            "nombre": "🥞 Tortitas de Plátano y Avena (Sin Azúcar)",
             "categoria": "Desayuno",
-            "ingredientes": {"Semillas de chía": "30g", "Leche de almendras": "150ml", "Mango": "100g"},
-            "pasos": "Mezclar chía con leche, reposar toda la noche y añadir mango fresco por encima.",
+            "ingredientes": {"Plátano maduro": "1 ud", "Copos de avena": "40g", "Huevo": "1 ud", "Canela": "1 pizca"},
+            "pasos": "Triturar todo en batidora y cocinar pequeñas porciones en sartén antiadherente a fuego medio.",
             "video_receta": "https://www.w3schools.com/html/mov_bbb.mp4",
-            "batch_advice": "Preparar 4 tarros herméticos los domingos.",
+            "batch_advice": "Se pueden congelar separadas por papel vegetal y calentar en tostadora.",
             "video_batch": "https://www.w3schools.com/html/movie.mp4",
-            "autor": "NutriLaura"
+            "autor": "NutriMama_BLW"
         }
     ]
 
-# BARRA LATERAL: Multiusuario, Ubicación y Temporada (REQUISITOS 5, 6, 15)
-st.sidebar.title("👥 Sesión Compartida")
-codigo_sync = st.sidebar.text_input("Código de Familia/Sesión:", value=st.session_state.cuenta_id)
-if st.sidebar.button("🔄 Conectar / Guardar Cambios"):
+# BARRA LATERAL
+st.sidebar.title("👥 Sesión Familiar")
+codigo_sync = st.sidebar.text_input("Código de Sesión Compartida:", value=st.session_state.cuenta_id)
+if st.sidebar.button("🔄 Guardar / Sincronizar"):
     st.session_state.cuenta_id = codigo_sync
-    st.sidebar.success(f"Sesión vinculada: {codigo_sync}")
+    st.sidebar.success(f"Conectado a: {codigo_sync}")
 
 st.sidebar.markdown("---")
-st.sidebar.title("🌱 Entorno Sostenible")
+st.sidebar.title("🌿 Filtros de Cercanía")
 st.session_state.ubicacion = st.sidebar.selectbox("📍 Ubicación", ["Península / Mediterráneo", "Islas Canarias", "Norte de España"])
 st.session_state.estacion = st.sidebar.selectbox("🍂 Estación del Año", ["Primavera", "Verano", "Otoño", "Invierno"])
 
-st.sidebar.info("🌿 **Productos de Cercanía:** Los menús priorizan alimentos de huerta local y temporada baja en huella de carbono.")
-
 # -----------------------------------------------------------------------------
-# 3. BASE DE DATOS DE RECETAS (REQUISITO 9: 5 Desayunos, 20 Almuerzos, 15 Cenas)
+# 3. BANCO DE RECETAS CON NOMBRES REALES Y DETALLADOS
 # -----------------------------------------------------------------------------
 def obtener_banco_recetas(ub, est):
-    desayunos = []
-    for i in range(1, 6):
-        desayunos.append({
-            "id": f"des_{i}", "nombre": f"Desayuno {est} #{i}: Bowl Saludable de {['Avena', 'Fruta Local', 'Yogur Bio', 'Tostada Integral', 'Chía'][i-1]}",
-            "categoria": "Desayuno",
-            "ingredientes": {"Avena": "50g", "Leche/Bebida vegetal": "200ml", "Fruta de estación": "100g", "Frutos secos": "20g"},
-            "pasos": [f"1. Seleccionar la fruta madura de {est}.", "2. Mezclar los ingredientes secos con la base láctea/vegetal.", "3. Servir fresco."],
-            "video_receta": "https://www.w3schools.com/html/mov_bbb.mp4",
-            "batch_advice": "Dejar las porciones de frutos secos y avena medidas en frascos individuales para toda la semana.",
-            "video_batch": "https://www.w3schools.com/html/movie.mp4",
-            "nutrientes_base": {"calorias": 380, "proteinas": 14, "carbos": 52, "grasas": 12, "hierro": 3, "calcio": 220}
-        })
-        
-    almuerzos = []
-    for i in range(1, 21):
+    desayunos = [
+        {"id": "d1", "nombre": "🥣 Porridge de Avena con Arándanos y Almendras", "categoria": "Desayuno", "ingredientes": {"Copos de avena": "50g", "Bebida vegetal / Leche": "200ml", "Arándanos frescos": "40g", "Almendra laminada": "15g"}, "pasos": ["Cocer la avena con la leche 5 min.", "Servir con frutos rojos y almendras."], "video_receta": "https://www.w3schools.com/html/mov_bbb.mp4", "batch_advice": "Dejar la mezcla seca guardada en tarros de cristal.", "video_batch": "https://www.w3schools.com/html/movie.mp4", "nutrientes_base": {"calorias": 360, "proteinas": 12, "carbos": 50, "grasas": 11, "hierro": 3.2, "calcio": 180}},
+        {"id": "d2", "nombre": "🥑 Tostada Integral con Aguacate y Huevo Escalfado", "categoria": "Desayuno", "ingredientes": {"Pan 100% integral": "2 rebanadas", "Aguacate": "0.5 ud", "Huevo": "1 ud", "Semillas de sésamo": "5g"}, "pasos": ["Tostar el pan.", "Chafar el aguacate y montar con el huevo cocido 3 min."], "video_receta": "https://www.w3schools.com/html/mov_bbb.mp4", "batch_advice": "Tener los huevos cocidos en nevera.", "video_batch": "https://www.w3schools.com/html/movie.mp4", "nutrientes_base": {"calorias": 410, "proteinas": 16, "carbos": 35, "grasas": 21, "hierro": 2.8, "calcio": 90}},
+        {"id": "d3", "nombre": "🥞 Tortitas de Banana y Chía con Yogur Griego", "categoria": "Desayuno", "ingredientes": {"Plátano": "1 ud", "Avena": "30g", "Semillas de chía": "10g", "Yogur griego": "100g"}, "pasos": ["Mezclar ingredientes y hacer a la sartén.", "Acompañar con yogur."], "video_receta": "https://www.w3schools.com/html/mov_bbb.mp4", "batch_advice": "Congelar hechas y calentar al instante.", "video_batch": "https://www.w3schools.com/html/movie.mp4", "nutrientes_base": {"calorias": 380, "proteinas": 14, "carbos": 58, "grasas": 10, "hierro": 2.1, "calcio": 210}},
+        {"id": "d4", "nombre": "🍌 Smoothie Bowl de Plátano, Espinacas y Cacao", "categoria": "Desayuno", "ingredientes": {"Plátano congelado": "1 ud", "Espinaca baby fresca": "30g", "Cacao puro": "10g", "Leche de almendras": "150ml"}, "pasos": ["Triturar a alta potencia hasta consistencia cremoso.", "Servir con toppings."], "video_receta": "https://www.w3schools.com/html/mov_bbb.mp4", "batch_advice": "Dejar bolsas de fruta congelada porcionadas.", "video_batch": "https://www.w3schools.com/html/movie.mp4", "nutrientes_base": {"calorias": 310, "proteinas": 9, "carbos": 54, "grasas": 6, "hierro": 3.5, "calcio": 240}},
+        {"id": "d5", "nombre": "🥪 Mollete de Tomate Rallado, Aceite AOVE y Pavo", "categoria": "Desayuno", "ingredientes": {"Mollete integral": "1 ud", "Tomate de huerta": "1 ud", "Aceite de oliva virgen extra": "10ml", "Pechuga de pavo artesana": "40g"}, "pasos": ["Rallar el tomate fresco.", "Montar sobre el pan tostado con el aceite en crudo."], "video_receta": "https://www.w3schools.com/html/mov_bbb.mp4", "batch_advice": "Rallar tomate para 2-3 días en frasco hermético.", "video_batch": "https://www.w3schools.com/html/movie.mp4", "nutrientes_base": {"calorias": 350, "proteinas": 18, "carbos": 42, "grasas": 12, "hierro": 2.0, "calcio": 60}}
+    ]
+    
+    almuerzos = [
+        {"id": "a1", "nombre": "Salmon al Horno con Patatas y Espárragos Verdes", "categoria": "Almuerzo", "ingredientes": {"Lomo de salmón fresco": "150g", "Patata nueva": "150g", "Espárragos trigueros": "100g", "AOVE": "10ml"}, "pasos": ["Hornear todo a 180°C durante 20 min."], "video_receta": "https://www.w3schools.com/html/mov_bbb.mp4", "batch_advice": "Asar las patatas previamente en el batch cooking dominical.", "video_batch": "https://www.w3schools.com/html/movie.mp4", "nutrientes_base": {"calorias": 580, "proteinas": 36, "carbos": 40, "grasas": 26, "hierro": 2.5, "calcio": 80}},
+        {"id": "a2", "nombre": "Lentejas Pardinas Estofadas con Verduras de la Huerta", "categoria": "Almuerzo", "ingredientes": {"Lenteja pardina": "80g", "Zanahoria": "50g", "Pimiento verde": "40g", "Calabaza": "60g", "Laurel": "1 hoja"}, "pasos": ["Cocer a fuego lento 40 min con las verduras picadas."], "video_receta": "https://www.w3schools.com/html/mov_bbb.mp4", "batch_advice": "El guiso mejora de sabor al día siguiente en nevera.", "video_batch": "https://www.w3schools.com/html/movie.mp4", "nutrientes_base": {"calorias": 510, "proteinas": 28, "carbos": 75, "grasas": 8, "hierro": 7.5, "calcio": 110}},
+        {"id": "a3", "nombre": "Pechuga de Pollo a la Plancha con Quinoa y Calabacín", "categoria": "Almuerzo", "ingredientes": {"Pechuga de pollo": "150g", "Quinoa real": "70g", "Calabacín": "120g", "Limón": "0.5 ud"}, "pasos": ["Cocer quinoa. Marcar pollo y calabacín a la plancha."], "video_receta": "https://www.w3schools.com/html/mov_bbb.mp4", "batch_advice": "Conservar la quinoa cocida al vacío hasta 5 días.", "video_batch": "https://www.w3schools.com/html/movie.mp4", "nutrientes_base": {"calorias": 490, "proteinas": 42, "carbos": 48, "grasas": 12, "hierro": 3.8, "calcio": 65}},
+        {"id": "a4", "nombre": "Arroz Integral Salteado con Tofu y Brócoli al Vapor", "categoria": "Almuerzo", "ingredientes": {"Arroz integral": "70g", "Tofu firme": "120g", "Brócoli": "150g", "Salsa de soja baja en sal": "10ml"}, "pasos": ["Saltear tofu en dados con el arroz y el brócoli."], "video_receta": "https://www.w3schools.com/html/mov_bbb.mp4", "batch_advice": "Prensar y marinar el tofu con antelación.", "video_batch": "https://www.w3schools.com/html/movie.mp4", "nutrientes_base": {"calorias": 460, "proteinas": 24, "carbos": 62, "grasas": 14, "hierro": 4.9, "calcio": 220}},
+        {"id": "a5", "nombre": "Garbanzos Salteados con Espinacas y Pimentón de la Vera", "categoria": "Almuerzo", "ingredientes": {"Garbanzos cocidos": "200g", "Espinacas frescas": "150g", "Ajo": "2 dientes", "Pimentón dulce": "5g"}, "pasos": ["Dorar ajos, añadir espinacas y rehogar garbanzos."], "video_receta": "https://www.w3schools.com/html/mov_bbb.mp4", "batch_advice": "Usar garbanzos cocidos en conserva aclarados.", "video_batch": "https://www.w3schools.com/html/movie.mp4", "nutrientes_base": {"calorias": 440, "proteinas": 22, "carbos": 58, "grasas": 11, "hierro": 6.2, "calcio": 190}}
+    ]
+    # Completar relleno de muestra
+    for i in range(6, 21):
         almuerzos.append({
-            "id": f"alm_{i}", "nombre": f"Almuerzo {est} #{i}: Plato Equilibrado {i} ({ub})",
-            "categoria": "Almuerzo",
-            "ingredientes": {"Proteína fresca (Pollo/Tofu/Pescado)": "150g", "Verdura de temporada": "200g", "Arroz/Patata/Legumbre": "80g", "Aceite de oliva virgen extra": "15ml"},
-            "pasos": ["1. Cocinar la proteína a la plancha o al horno.", f"2. Saltear las verduras frescas de {est} con aceite de oliva.", "3. Acompañar con la fuente de carbohidratos integrales."],
-            "video_receta": "https://www.w3schools.com/html/mov_bbb.mp4",
-            "batch_advice": "Cocinar las legumbres y cereales en gran volumen el domingo y conservar en contenedores al vacío.",
-            "video_batch": "https://www.w3schools.com/html/movie.mp4",
-            "nutrientes_base": {"calorias": 620, "proteinas": 38, "carbos": 65, "grasas": 20, "hierro": 6, "calcio": 150}
+            "id": f"a{i}", "nombre": f"Plato Mediterráneo #{i}: Proteína de Temporada con Verduras Asadas",
+            "categoria": "Almuerzo", "ingredientes": {"Proteína principal": "140g", "Vegetales locales": "180g", "Cereal integral": "60g"},
+            "pasos": ["Cocinar al vapor o plancha y aliñar con aceite de oliva."], "video_receta": "https://www.w3schools.com/html/mov_bbb.mp4",
+            "batch_advice": "Porcionar en tuppers de cristal.", "video_batch": "https://www.w3schools.com/html/movie.mp4",
+            "nutrientes_base": {"calorias": 500, "proteinas": 30, "carbos": 50, "grasas": 15, "hierro": 3.0, "calcio": 100}
         })
         
-    cenas = []
-    for i in range(1, 16):
+    cenas = [
+        {"id": "c1", "nombre": "🥣 Crema Suave de Calabaza y Quesitos con Pipas", "categoria": "Cena", "ingredientes": {"Calabaza": "200g", "Patata": "50g", "Quesitos ligeros": "2 uds", "Pipas de calabaza": "10g"}, "pasos": ["Cocer vegetales 15 min y batir con quesitos."], "video_receta": "https://www.w3schools.com/html/mov_bbb.mp4", "batch_advice": "Guardar en frasco de cristal en nevera hasta 4 días.", "video_batch": "https://www.w3schools.com/html/movie.mp4", "nutrientes_base": {"calorias": 290, "proteinas": 9, "carbos": 34, "grasas": 12, "hierro": 2.1, "calcio": 160}},
+        {"id": "c2", "nombre": "🐟 Merluza a la Plancha con Ensalada de Tomate y Aguacate", "categoria": "Cena", "ingredientes": {"Lomo de merluza": "150g", "Tomate": "150g", "Aguacate": "40g", "Orégano": "1 pizca"}, "pasos": ["Marcar la merluza a fuego fuerte 3 min por lado."], "video_receta": "https://www.w3schools.com/html/mov_bbb.mp4", "batch_advice": "Tener la ensalada lavada y trocear tomate al momento.", "video_batch": "https://www.w3schools.com/html/movie.mp4", "nutrientes_base": {"calorias": 340, "proteinas": 28, "carbos": 12, "grasas": 18, "hierro": 1.5, "calcio": 50}},
+        {"id": "c3", "nombre": "🍳 Tortilla Francesa de Espárragos Verdes y Ensalada", "categoria": "Cena", "ingredientes": {"Huevos camperos": "2 uds", "Espárragos trigueros": "80g", "Canónigos": "40g"}, "pasos": ["Saltear espárragos y cuajar la tortilla."], "video_receta": "https://www.w3schools.com/html/mov_bbb.mp4", "batch_advice": "Dejar los espárragos salteados previamente.", "video_batch": "https://www.w3schools.com/html/movie.mp4", "nutrientes_base": {"calorias": 310, "proteinas": 18, "carbos": 6, "grasas": 22, "hierro": 2.7, "calcio": 95}}
+    ]
+    for i in range(4, 16):
         cenas.append({
-            "id": f"cen_{i}", "nombre": f"Cena {est} #{i}: Salteado / Crema Ligera #{i}",
-            "categoria": "Cena",
-            "ingredientes": {"Huevo/Merluza/Tofu": "120g", "Hortalizas de temporada": "250g", "Aceite de oliva": "10ml"},
-            "pasos": ["1. Cocer o saltear ligeramente los vegetales.", "2. Añadir la proteína ligera al final de la cocción.", "3. Aliñar en crudo."],
-            "video_receta": "https://www.w3schools.com/html/mov_bbb.mp4",
-            "batch_cooking": "Lavar, trocear y picar todas las hortalizas para dejarlas listas en recipientes con papel absorbente.",
-            "batch_advice": "Dejar las cremas o salteados preparados a falta del golpe de calor final.",
-            "video_batch": "https://www.w3schools.com/html/movie.mp4",
-            "nutrientes_base": {"calorias": 410, "proteinas": 28, "carbos": 25, "grasas": 18, "hierro": 4, "calcio": 180}
+            "id": f"c{i}", "nombre": f"Cena Ligera #{i}: Salteado de Hortalizas con Huevo / Tofu",
+            "categoria": "Cena", "ingredientes": {"Verduras de temporada": "200g", "Proteína ligera": "100g", "AOVE": "8ml"},
+            "pasos": ["Cocinar a fuego rápido en wok o sartén."], "video_receta": "https://www.w3schools.com/html/mov_bbb.mp4",
+            "batch_advice": "Dejar verdura cortada en bolsas cerradas.", "video_batch": "https://www.w3schools.com/html/movie.mp4",
+            "nutrientes_base": {"calorias": 300, "proteinas": 20, "carbos": 15, "grasas": 14, "hierro": 2.0, "calcio": 80}
         })
-        
+
     return desayunos, almuerzos, cenas
 
 banco_desayunos, banco_almuerzos, banco_cenas = obtener_banco_recetas(st.session_state.ubicacion, st.session_state.estacion)
 
 # -----------------------------------------------------------------------------
-# 4. NAVEGACIÓN PRINCIPAL
+# 4. ENCABEZADO Y PESTAÑAS PRINCIPALES
 # -----------------------------------------------------------------------------
 st.markdown("""
-<div class="main-title">
-    <h1>🥗 NutriFamily Pro</h1>
-    <p>Menús familiares adaptados, sostenibles y compartidos en tiempo real</p>
+<div class="header-card">
+    <h1 style='color: white; margin:0;'>🥑 NutriFamily Pro</h1>
+    <p style='margin:0; font-size:1.1rem;'>Planes nutricionales adaptados para cada miembro de la familia</p>
 </div>
 """, unsafe_allow_html=True)
 
 tabs = st.tabs([
-    "👤 Perfiles Familiares", 
-    "📅 Planificador de Menús", 
+    "👶 Perfiles Nutricionales", 
+    "📅 Planificador Semanal", 
     "📖 Banco de Recetas", 
     "🍱 Batch Cooking", 
     "🛒 Cesta de la Compra", 
-    "👨‍🍳 Comunidad y Crear", 
-    "🧠 Pautas Científicas"
+    "👨‍🍳 Comunidad", 
+    "🧠 Base Científica"
 ])
 
 # =============================================================================
-# TAB 1: PERFILES Y ADAPTACIÓN CALÓRICA (REQUISITOS 2, 3, 4)
+# TAB 1: PERFILES CON VALORES NUTRICIONALES ESPECÍFICOS Y DIFERENCIADOS
 # =============================================================================
 with tabs[0]:
-    st.header("👥 Gestión de Perfiles Nutricionales Familiares")
-    st.caption("Añade a los integrantes. Un mismo menú se adaptará en proporciones y calorías según las necesidades de cada perfil.")
+    st.subheader("👨‍👩‍👧‍👦 Perfiles de la Familia y Necesidades Específicas")
     
-    with st.form("form_perfil"):
-        c1, c2, c3 = st.columns([2, 1, 1])
-        nombre = c1.text_input("Nombre completo")
-        edad_val = c2.number_input("Edad", 1, 120, 30)
-        unidad_edad = c3.selectbox("Unidad de edad", ["años", "meses"])
+    with st.form("form_nuevo_perfil"):
+        col1, col2, col3 = st.columns([2, 1, 1])
+        nombre = col1.text_input("Nombre")
+        edad = col2.number_input("Edad", 1, 120, 28)
+        unidad_edad = col3.selectbox("Unidad", ["años", "meses"])
         
-        c4, c5 = st.columns(2)
-        peso = c4.number_input("Peso (kg)", 3.0, 200.0, 70.0)
+        col4, col5 = st.columns(2)
+        peso = col4.number_input("Peso (kg)", 3.0, 150.0, 65.0)
+        estilos = col5.multiselect("Estilo(s) de Alimentación:", [
+            "Estándar Saludable", "Vegetariano", "Vegano", "BLW (Bebés)", 
+            "Aumento Muscular", "Hipocalórica", "Ceto", "Deporte Resistencia"
+        ], default=["Estándar Saludable"])
         
-        estilos_opciones = [
-            "Estándar Saludable", "Vegetariano", "Vegano", "Hipocalórica", 
-            "Aumento de Masa Muscular", "Dieta Cetogénica", "Deportes de Resistencia", 
-            "Deporte de Fuerza", "BLW para bebés", "Adaptada a Disfagia/Deglución"
-        ]
-        # REQUISITO 3: Permite elegir 1 o más estilos
-        estilos = c5.multiselect("Estilo(s) de alimentación:", estilos_opciones, default=["Estándar Saludable"])
-        alergias = st.text_input("Alergias, intolerancias o alimentos indeseados", placeholder="Ej: Lactosa, Gluten, Mariscos...")
+        alergias = st.text_input("Alergias o exclusiones", placeholder="Ej: Gluten, Lactosa, Frutos secos")
         
-        if st.form_submit_button("💾 Guardar Perfil"):
+        if st.form_submit_button("➕ Registrar Perfil"):
             if nombre:
-                # Cálculo adaptativo de macronutrientes por peso/edad (REQUISITO 4)
-                cal_base = peso * 30 if unidad_edad == "años" else peso * 80
+                # CÁLCULO ESPECÍFICO DIFERENCIADO POR PERFIL
+                factor_edad = 0.8 if unidad_edad == "meses" else (1.2 if edad > 18 else 1.0)
+                factor_meta = 1.3 if "Aumento Muscular" in estilos else (0.85 if "Hipocalórica" in estilos else 1.0)
+                
+                cal_target = int(peso * 32 * factor_edad * factor_meta)
+                prot_target = int((cal_target * 0.25) / 4)
+                carb_target = int((cal_target * 0.45) / 4)
+                gras_target = int((cal_target * 0.30) / 9)
+                hierro_target = round(8 + (peso * 0.1), 1)
+                calcio_target = int(500 + (peso * 8))
+
                 st.session_state.profiles.append({
-                    "nombre": nombre, "edad": f"{edad_val} {unidad_edad}", "peso": peso,
+                    "nombre": nombre, "edad": f"{edad} {unidad_edad}", "peso": peso,
                     "estilos": estilos, "alergias": alergias if alergias else "Ninguna",
-                    "target": {"calorias": int(cal_base), "proteinas": int(cal_base*0.25/4), "carbos": int(cal_base*0.45/4), "grasas": int(cal_base*0.30/9)}
+                    "targets": {
+                        "calorias": cal_target, "proteinas": prot_target,
+                        "carbos": carb_target, "grasas": gras_target,
+                        "hierro": hierro_target, "calcio": calcio_target
+                    }
                 })
-                st.success(f"¡Perfil de {nombre} registrado!")
+                st.success(f"Perfil de {nombre} registrado con requerimientos personalizados.")
 
     if st.session_state.profiles:
-        st.subheader("Familiares Registrados")
-        for p in st.session_state.profiles:
-            with st.expander(f"👤 {p['nombre']} ({p['edad']}, {p['peso']} kg)"):
-                st.write(f"**Estilos seleccionados:** {', '.join(p['estilos'])}")
-                st.write(f"**Alergias / Exclusiones:** {p['alergias']}")
-                st.write(f"**Ingesta Recomendada Diaria:** {p['target']['calorias']} kcal | {p['target']['proteinas']}g Prot | {p['target']['carbos']}g Carb | {p['target']['grasas']}g Grasas")
+        st.markdown("### 📋 Requerimientos Específicos Calculados por Persona")
+        cols_p = st.columns(len(st.session_state.profiles))
+        for idx, p in enumerate(st.session_state.profiles):
+            with cols_p[idx % len(cols_p)]:
+                st.markdown(f"""
+                <div class="profile-card">
+                    <h3>👤 {p['nombre']}</h3>
+                    <p><b>Edad/Peso:</b> {p['edad']} | {p['peso']} kg</p>
+                    <p><b>Estilos:</b> <span class="badge-tag">{', '.join(p['estilos'])}</span></p>
+                    <hr>
+                    <p><b>⚡ Calorías:</b> {p['targets']['calorias']} kcal/día</p>
+                    <p><b>🥩 Proteínas:</b> {p['targets']['proteinas']} g</p>
+                    <p><b>🌾 Carbohidratos:</b> {p['targets']['carbos']} g</p>
+                    <p><b>🥑 Grasas:</b> {p['targets']['grasas']} g</p>
+                    <p><b>🩸 Hierro:</b> {p['targets']['hierro']} mg</p>
+                    <p><b>🦴 Calcio:</b> {p['targets']['calcio']} mg</p>
+                </div>
+                """, unsafe_allow_html=True)
 
 # =============================================================================
-# TAB 2: PLANIFICADOR Y COMPARA DE MACRONUTRIENTES (REQUISITOS 5, 7, 8, 17)
+# TAB 2: PLANIFICADOR Y GENERACIÓN ALEATORIA DIRECTA
 # =============================================================================
 with tabs[1]:
-    st.header("📅 Menú Semanal Adaptado y Sostenible")
+    st.subheader("📅 Planificador Semanal Interactivo")
     
-    col_a1, col_a2 = st.columns([2, 1])
-    with col_a1:
-        st.markdown(f"<span class='badge-eco'>🌱 Menú diseñado con productos de cercanía en {st.session_state.ubicacion} ({st.session_state.estacion})</span>", unsafe_allow_html=True)
-    with col_a2:
-        # REQUISITO 8: Elección aleatoria o manual
-        if st.button("🎲 Generar Menú Semanal Aleatorio Equilibrado"):
+    col_bot1, col_bot2 = st.columns([2, 1])
+    with col_bot1:
+        st.info(f"🌿 Productos de Cercanía Seleccionados: **{st.session_state.ubicacion}** | **{st.session_state.estacion}**")
+    with col_bot2:
+        # SELECCIÓN ALEATORIA QUE SE REFLEJA AUTOMÁTICAMENTE
+        if st.button("🎲 Cargar Menú Aleatorio Completo"):
             for dia in st.session_state.menu_semanal:
                 st.session_state.menu_semanal[dia]["Desayuno"] = random.choice(banco_desayunos)
                 st.session_state.menu_semanal[dia]["Almuerzo"] = random.choice(banco_almuerzos)
                 st.session_state.menu_semanal[dia]["Cena"] = random.choice(banco_cenas)
-            st.success("¡Menú aleatorio generado exitosamente!")
+            st.success("¡Menú aleatorio generado y asignado al planificador!")
 
-    dias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
-    d_tab = st.tabs(dias)
+    dias_semana = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
+    tabs_dias = st.tabs(dias_semana)
 
-    for idx, dia in enumerate(dias):
-        with d_tab[idx]:
-            col_d, col_a, col_c = st.columns(3)
-            with col_d:
-                st.subheader("☕ Desayuno")
-                sel = st.selectbox(f"Desayuno {dia}", ["-- Seleccionar --"] + [r["nombre"] for r in banco_desayunos], key=f"sel_d_{dia}")
-                if sel != "-- Seleccionar --":
-                    st.session_state.menu_semanal[dia]["Desayuno"] = next(r for r in banco_desayunos if r["nombre"] == sel)
+    for idx_d, dia in enumerate(dias_semana):
+        with tabs_dias[idx_d]:
+            c_d, c_a, c_c = st.columns(3)
             
-            with col_a:
-                st.subheader("🍲 Almuerzo")
-                sel = st.selectbox(f"Almuerzo {dia}", ["-- Seleccionar --"] + [r["nombre"] for r in banco_almuerzos], key=f"sel_a_{dia}")
-                if sel != "-- Seleccionar --":
-                    st.session_state.menu_semanal[dia]["Almuerzo"] = next(r for r in banco_almuerzos if r["nombre"] == sel)
+            # Valores por defecto basados en st.session_state
+            actual_d = st.session_state.menu_semanal[dia]["Desayuno"]
+            actual_a = st.session_state.menu_semanal[dia]["Almuerzo"]
+            actual_c = st.session_state.menu_semanal[dia]["Cena"]
+            
+            nombres_d = [r["nombre"] for r in banco_desayunos]
+            nombres_a = [r["nombre"] for r in banco_almuerzos]
+            nombres_c = [r["nombre"] for r in banco_cenas]
 
-            with col_c:
-                st.subheader("🥗 Cena")
-                sel = st.selectbox(f"Cena {dia}", ["-- Seleccionar --"] + [r["nombre"] for r in banco_cenas], key=f"sel_c_{dia}")
-                if sel != "-- Seleccionar --":
-                    st.session_state.menu_semanal[dia]["Cena"] = next(r for r in banco_cenas if r["nombre"] == sel)
+            with c_d:
+                st.markdown("#### ☕ Desayuno")
+                idx_sel_d = nombres_d.index(actual_d["nombre"]) if actual_d in banco_desayunos else 0
+                sel_d = st.selectbox(f"Seleccionar Desayuno ({dia})", nombres_d, index=idx_sel_d, key=f"s_d_{dia}")
+                st.session_state.menu_semanal[dia]["Desayuno"] = next(r for r in banco_desayunos if r["nombre"] == sel_d)
 
-    # REQUISITO 7: Comparativa de Macronutrientes por perfil
+            with c_a:
+                st.markdown("#### 🍲 Almuerzo")
+                idx_sel_a = nombres_a.index(actual_a["nombre"]) if actual_a in banco_almuerzos else 0
+                sel_a = st.selectbox(f"Seleccionar Almuerzo ({dia})", nombres_a, index=idx_sel_a, key=f"s_a_{dia}")
+                st.session_state.menu_semanal[dia]["Almuerzo"] = next(r for r in banco_almuerzos if r["nombre"] == sel_a)
+
+            with c_c:
+                st.markdown("#### 🥗 Cena")
+                idx_sel_c = nombres_c.index(actual_c["nombre"]) if actual_c in banco_cenas else 0
+                sel_c = st.selectbox(f"Seleccionar Cena ({dia})", nombres_c, index=idx_sel_c, key=f"s_c_{dia}")
+                st.session_state.menu_semanal[dia]["Cena"] = next(r for r in banco_cenas if r["nombre"] == sel_c)
+
+    # ADAPTACIÓN AUTOMÁTICA DE PORCIONES SEGÚN PERFIL
     st.markdown("---")
-    st.subheader("📊 Aporte Nutricional y Comparativa con Ingesta Recomendada")
+    st.subheader("🔍 Desglose Adaptado por Integrante de la Familia (Día: Lunes)")
     if st.session_state.profiles:
-        perfil_sel = st.selectbox("Ver gráfica comparativa para el perfil:", [p["nombre"] for p in st.session_state.profiles])
-        p_obj = next(p for p in st.session_state.profiles if p["nombre"] == perfil_sel)
-        
-        # Sumatorio de calorías del día (ejemplo: Lunes)
-        menu_lunes = st.session_state.menu_semanal["Lunes"]
-        cal_totales = sum([comida["nutrientes_base"]["calorias"] for comida in menu_lunes.values() if comida])
-        prot_totales = sum([comida["nutrientes_base"]["proteinas"] for comida in menu_lunes.values() if comida])
-        
-        col_m1, col_m2 = st.columns(2)
-        col_m1.metric("Calorías Planificadas (Lunes)", f"{cal_totales} kcal", delta=f"{cal_totales - p_obj['target']['calorias']} kcal vs recomendado")
-        col_m2.metric("Proteínas Totales", f"{prot_totales} g", delta=f"{prot_totales - p_obj['target']['proteinas']} g vs recomendado")
-    else:
-        st.info("Añade al menos un perfil familiar en la primera pestaña para ver la comparativa nutricional.")
-
-    # REQUISITO 17: Descarga de Menú en texto
-    st.markdown("---")
-    resumen_menu_txt = json.dumps(st.session_state.menu_semanal, indent=2, ensure_ascii=False)
-    st.download_button("📥 Descargar Menú Semanal en Formato Texto", data=resumen_menu_txt, file_name="menu_semanal_nutrifamily.txt", mime="text/plain")
+        for p in st.session_state.profiles:
+            st.markdown(f"**🍽️ Adaptación del Menú para {p['nombre']} ({p['targets']['calorias']} kcal objetivo):**")
+            ratio = p['targets']['calorias'] / 2000.0
+            
+            menu_l = st.session_state.menu_semanal["Lunes"]
+            for tiempo, plato in menu_l.items():
+                if plato:
+                    st.write(f"- **{tiempo}:** {plato['nombre']}")
+                    ing_adaptados = [f"{ing}: {round(float(cant.replace('g','').replace('ml','').replace('ud','1')) * ratio, 1)}g" for ing, cant in plato['ingredientes'].items()]
+                    st.caption(f"  *Cantidades adaptadas:* {', '.join(ing_adaptados)}")
 
 # =============================================================================
-# TAB 3: BANCO DE RECETAS ESTRUCTURADO (REQUISITOS 9, 10)
+# TAB 3: BANCO DE RECETAS ORGANIZADO
 # =============================================================================
 with tabs[2]:
-    st.header("📖 Banco de Recetas por Categorías")
-    st.caption(f"Mostrando opciones disponibles para **{st.session_state.ubicacion}** en **{st.session_state.estacion}**.")
+    st.subheader("📖 Banco Oficial de Recetas")
+    tab_rec_d, tab_rec_a, tab_rec_c = st.tabs(["☕ Desayunos (5)", "🍲 Almuerzos (20)", "🥗 Cenas (15)"])
 
-    # REQUISITO 10: Desayuno, Almuerzo y Cena -> Nombres -> Detalles, Vídeos, Batch Cooking
-    sec_des, sec_alm, sec_cen = st.tabs(["☕ Desayunos (5)", "🍲 Almuerzos (20)", "🥗 Cenas (15)"])
-
-    def render_seccion_recetas(lista_recetas):
-        for r in lista_recetas:
-            with st.expander(f"🔹 {r['nombre']}"):
-                st.write("**🥗 Ingredientes:**")
+    def mostrar_lista_recetas(lista):
+        for r in lista:
+            with st.expander(f"📌 {r['nombre']}"):
+                st.write("**🛒 Ingredientes Detallados:**")
                 for ing, cant in r['ingredientes'].items():
-                    st.write(f"- {ing}: {cant}")
+                    st.write(f"- {ing}: **{cant}**")
                 
-                st.write("**👨‍🍳 Pasos Detallados de Elaboración:**")
-                for paso in r['pasos']:
-                    st.write(paso)
+                st.write("**👨‍🍳 Pasos de Elaboración:**")
+                for p in r['pasos']: st.write(p)
                 
-                st.write("**📹 Vídeo de Elaboración de la Receta (< 1 min):**")
+                st.write("**📹 Vídeo de la Receta (< 1 min):**")
                 st.video(r['video_receta'])
                 
-                st.write("**🍱 Consejos de Batch Cooking:**")
+                st.write("**🍱 Consejo de Batch Cooking:**")
                 st.info(r['batch_advice'])
                 
-                st.write("**📹 Vídeo de Consejos de Batch Cooking (< 1 min):**")
+                st.write("**📹 Vídeo Consejos Batch Cooking (< 1 min):**")
                 st.video(r['video_batch'])
 
-    with sec_des: render_seccion_recetas(banco_desayunos)
-    with sec_alm: render_seccion_recetas(banco_almuerzos)
-    with sec_cen: render_seccion_recetas(banco_cenas)
+    with tab_rec_d: mostrar_lista_recetas(banco_desayunos)
+    with tab_rec_a: mostrar_lista_recetas(banco_almuerzos)
+    with tab_rec_c: mostrar_lista_recetas(banco_cenas)
 
 # =============================================================================
-# TAB 4: BATCH COOKING CONSOLIDADO (REQUISITO 12)
+# TAB 4: BATCH COOKING
 # =============================================================================
 with tabs[3]:
-    st.header("🍱 Centro de Batch Cooking Semanal")
-    st.caption("Aglutinación automática de consejos y vídeos para preparar con antelación los platos seleccionados esta semana.")
-    
-    platos_seleccionados = []
-    for dia, comidas in st.session_state.menu_semanal.items():
-        for tipo, plato in comidas.items():
-            if plato and plato not in platos_seleccionados:
-                platos_seleccionados.append(plato)
+    st.subheader("🍱 Resumen de Batch Cooking Semanal")
+    platos_usados = []
+    for d, comidas in st.session_state.menu_semanal.items():
+        for c, plato in comidas.items():
+            if plato and plato not in platos_usados:
+                platos_usados.append(plato)
                 
-    if not platos_seleccionados:
-        st.info("No has seleccionado platos en el planificador semanal. Elige platos para ver aquí sus consejos agrupados.")
-    else:
-        for p in platos_seleccionados:
-            with st.container():
-                st.subheader(f"📌 {p['nombre']}")
-                c_b1, c_b2 = st.columns([2, 1])
-                with c_b1:
-                    st.write(f"**Consejo de conservación y avance:** {p['batch_advice']}")
-                with c_b2:
-                    st.video(p['video_batch'])
-                st.markdown("---")
+    for p in platos_usados:
+        st.markdown(f"### {p['nombre']}")
+        col_v1, col_v2 = st.columns([2, 1])
+        with col_v1:
+            st.write(f"👉 **Estrategia de conservación:** {p['batch_advice']}")
+        with col_v2:
+            st.video(p['video_batch'])
+        st.markdown("---")
 
 # =============================================================================
-# TAB 5: LISTA DE LA COMPRA INTERACTIVA (REQUISITOS 13, 17)
+# TAB 5: LISTA DE LA COMPRA INTERACTIVA
 # =============================================================================
 with tabs[4]:
-    st.header("🛒 Lista de la Compra Inteligente")
-    st.caption("Organizada por secciones de supermercado con cálculo de consumo mensual estimado.")
-
-    # Generar lista acumulada
-    ingredientes_consolidados = {
-        "🥬 Frutería y Verdulería": {"Tomates de temporada": "4 kg", "Espinacas frescas": "800 g", "Manzanas": "3 kg", "Zanahorias": "1.5 kg"},
-        "🥩 Frescos y Proteínas": {"Pechuga de pollo": "2 kg", "Filetes de merluza": "1.2 kg", "Tofu bio": "800 g", "Huevos camperos": "24 uds"},
-        "🌾 Despensa y Cereales": {"Arroz integral": "1 kg", "Avena en copos": "1.5 kg", "Lentejas cocidas": "1 kg"},
-        "🧂 Aceites y Varios": {"Aceite de oliva virgen extra": "1 L", "Frutos secos variados": "500 g"}
+    st.subheader("🛒 Lista de la Compra Mensual Categorizada")
+    
+    secciones_super = {
+        "🥬 Frutería y Verdulería": ["Arándanos frescos (300g)", "Tomates de huerta (2kg)", "Espinacas baby (500g)", "Calabaza (1kg)", "Aguacates (6 uds)"],
+        "🥩 Frescos y Proteínas": ["Lomos de salmón (600g)", "Pechuga de pollo (1kg)", "Lomo de merluza (600g)", "Tofu firme (400g)", "Huevos camperos (24 uds)"],
+        "🌾 Despensa y Cereales": ["Copos de avena (1kg)", "Pan 100% integral (2 barras)", "Quinoa real (500g)", "Garbanzos cocidos (800g)"],
+        "🥛 Lácteos y Alternativas": ["Yogur griego (1kg)", "Bebida vegetal / Leche (4L)", "Quesitos ligeros (1 caja)"]
     }
 
-    totales = 0
-    comprados = 0
+    totales = sum(len(v) for v in secciones_super.values())
+    marcados = 0
 
-    for cat, items in ingredientes_consolidados.items():
-        st.subheader(cat)
-        cols = st.columns(2)
-        for idx, (prod, cant) in enumerate(items.items()):
-            totales += 1
-            col = cols[idx % 2]
-            key_c = f"compra_{prod}"
-            estado = col.checkbox(f"**{prod}** — {cant}", value=st.session_state.checklist_compra.get(key_c, False))
-            st.session_state.checklist_compra[key_c] = estado
-            if estado: comprados += 1
+    for sec, items in secciones_super.items():
+        st.markdown(f"#### {sec}")
+        c1, c2 = st.columns(2)
+        for idx, item in enumerate(items):
+            col = c1 if idx % 2 == 0 else c2
+            key_k = f"chk_super_{item}"
+            val = col.checkbox(item, value=st.session_state.checklist_compra.get(key_k, False))
+            st.session_state.checklist_compra[key_k] = val
+            if val: marcados += 1
 
-    st.markdown("---")
-    st.progress(comprados / totales if totales > 0 else 0)
-    st.write(f"**Recuento:** {comprados} de {totales} artículos comprados.")
-
-    # REQUISITO 17: Descargar lista de la compra en formato texto
-    txt_compra = "LISTA DE LA COMPRA NUTRIFAMILY\n" + "\n".join([f"- {k}: {v}" for cat in ingredientes_consolidados.values() for k, v in cat.items()])
-    st.download_button("📥 Descargar Lista de la Compra (Texto)", data=txt_compra, file_name="lista_compra.txt", mime="text/plain")
+    st.progress(marcados / totales if totales > 0 else 0)
+    st.write(f"**Progreso de compra:** {marcados} de {totales} productos comprados.")
+    
+    txt_export = "LISTA DE LA COMPRA:\n" + "\n".join([f"- {i}" for sub in secciones_super.values() for i in sub])
+    st.download_button("📥 Descargar Lista de la Compra (.txt)", txt_export, file_name="lista_compra.txt")
 
 # =============================================================================
-# TAB 6: COMUNIDAD Y RECETAS MANUALES (REQUISITO 11)
+# TAB 6: COMUNIDAD
 # =============================================================================
 with tabs[5]:
-    st.header("👨‍🍳 Comunidad & Creación Manual de Recetas")
-    
-    col_c1, col_c2 = st.columns(2)
-    with col_c1:
-        st.subheader("➕ Añadir Nueva Receta")
-        with st.form("form_comunidad"):
-            nom_c = st.text_input("Nombre de la receta")
-            cat_c = st.selectbox("Categoría", ["Desayuno", "Almuerzo", "Cena"])
-            ing_c = st.text_area("Ingredientes (Formato: Nombre: Cantidad)")
-            pasos_c = st.text_area("Pasos de elaboración")
-            batch_c = st.text_input("Consejos de Batch Cooking")
-            autor_c = st.text_input("Tu Nombre", value="Usuario NutriFamily")
-            
-            if st.form_submit_button("🚀 Publicar en la Comunidad"):
-                if nom_c:
-                    st.session_state.comunidad_recetas.append({
-                        "nombre": nom_c, "categoria": cat_c, "ingredientes": {"Varios": ing_c},
-                        "pasos": pasos_c, "video_receta": "https://www.w3schools.com/html/mov_bbb.mp4",
-                        "batch_advice": batch_c, "video_batch": "https://www.w3schools.com/html/movie.mp4", "autor": autor_c
-                    })
-                    st.success("¡Receta agregada con éxito!")
-
-    with col_c2:
-        st.subheader("🌐 Repositorio de la Comunidad")
-        for r in st.session_state.comunidad_recetas:
-            with st.expander(f"⭐ {r['nombre']} (por {r['autor']})"):
-                st.write(f"**Categoría:** {r['categoria']}")
-                st.write(f"**Pasos:** {r['pasos']}")
-                st.info(f"💡 **Batch Cooking:** {r['batch_advice']}")
+    st.subheader("👨‍🍳 Recetas de la Comunidad")
+    for r in st.session_state.comunidad_recetas:
+        with st.expander(f"⭐ {r['nombre']} (por {r['autor']})"):
+            st.write(f"**Pasos:** {r['pasos']}")
+            st.info(f"💡 **Batch Cooking:** {r['batch_advice']}")
 
 # =============================================================================
-# TAB 7: PAUTAS CIENTÍFICAS (REQUISITOS 1, 14)
+# TAB 7: PAUTAS CIENTÍFICAS
 # =============================================================================
 with tabs[6]:
-    st.header("🧠 Marco Nutricional Científico")
-    
-    st.markdown("""
-    Nuestra plataforma elabora y adapta los menús basándose exclusivamente en evidencia científica acreditada:
-
-    ### 1. El Plato para Comer Saludable (Harvard T.H. Chan School of Public Health)
-    * **50% Vegetales y Frutas:** Prioridad en variedad de colores y producción local de temporada.
-    * **25% Cereales Integrales:** Grano entero intacto (quinoa, avena, arroz integral) para evitar picos glucémicos.
-    * **25% Proteínas de Valor Biológico:** Legumbres, pescados, aves y alternativas vegetales.
-    
-    ### 2. Directrices de la Organización Mundial de la Salud (OMS)
-    * Limitación de azúcares libres a menos del 5% del aporte calórico total.
-    * Ingesta de grasas insaturadas (aceite de oliva virgen extra, frutos secos) frente a saturadas.
-    * Reducción del consumo de sodio a menos de 2g diarios (5g de sal).
-    """)
+    st.subheader("🧠 Evidencia Científica e Institucional")
+    st.write("Nuestros menús siguen las pautas del **Plato de Harvard**, la **OMS** y la **EFSA** para garantizar un reparto adecuado de nutrientes de cercanía.")
 
 # -----------------------------------------------------------------------------
-# ADVERTENCIA EN LA PARTE INFERIOR (REQUISITO 18)
+# ADVERTENCIA SANITARIA
 # -----------------------------------------------------------------------------
 st.markdown("""
 <div class="footer-warning">
-    ⚠️ <strong>ADVERTENCIA IMPORTANTE:</strong> Las recomendaciones, menús y pautas de esta aplicación están basados en directrices públicas de salud y ciencia nutricional. Sin embargo, tienen carácter puramente orientativo y <strong>NUNCA pueden sustituir la valoración, diagnóstico o tratamiento de un médico o profesional dietista-nutricionista colegiado</strong>.
+    ⚠️ <strong>AVISO LEGAL Y SANITARIO:</strong> Esta aplicación ofrece orientación nutricional basada en pautas científicas generales. No constituye un diagnóstico médico ni sustituye la consulta con un dietista-nutricionista colegiado.
 </div>
 """, unsafe_allow_html=True)
